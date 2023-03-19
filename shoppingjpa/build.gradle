@@ -1,0 +1,100 @@
+/* 10-1. querydsl version 정보 추가 */
+
+buildscript {
+
+	ext {
+
+		queryDslVersion = "5.0.0";
+
+	}
+
+}
+
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.9'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+
+	/* 10-2. querydsl plugin 추가 */
+
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+
+
+}
+
+
+
+group = 'com.tomshop'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.32'
+
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+
+	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.security:spring-security-test'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+
+	implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.9'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+//querydsl 추가 시작
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+sourceSets {
+	main.java.srcDir querydslDir
+}
+compileQuerydsl{
+	options.annotationProcessorPath = configurations.querydsl
+}
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
+}
+//querydsl 추가 끝
